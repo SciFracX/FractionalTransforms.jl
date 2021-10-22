@@ -6,11 +6,11 @@ DocMeta.setdocmeta!(FractionalTransforms, :DocTestSetup, :(using FractionalTrans
 makedocs(;
     modules=[FractionalTransforms],
     authors="Qingyu Qu",
-    repo="https://github.com/ErikQQY/FractionalTransforms.jl/blob/{commit}{path}#{line}",
+    repo="https://github.com/SciFracX/FractionalTransforms.jl/blob/{commit}{path}#{line}",
     sitename="FractionalTransforms.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://ErikQQY.github.io/FractionalTransforms.jl",
+        canonical="https://SciFracX.github.io/FractionalTransforms.jl",
         assets=String[],
     ),
     pages=[
@@ -19,5 +19,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/ErikQQY/FractionalTransforms.jl",
+    repo="github.com/SciFracX/FractionalTransforms.jl",
 )

@@ -1,14 +1,3 @@
-```@meta
-CurrentModule = FractionalTransforms
-```
+# FractionalTransforms.jl
 
-# FractionalTransforms
-
-Documentation for [FractionalTransforms](https://github.com/ErikQQY/FractionalTransforms.jl).
-
-```@index
-```
-
-```@autodocs
-Modules = [FractionalTransforms]
-```
+Hello there👋
