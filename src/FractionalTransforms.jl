@@ -1,6 +1,6 @@
 module FractionalTransforms
 
-using LinearAlgebra, DSP.conv, ToeplitzMatrices, FFTW
+using LinearAlgebra, DSP, ToeplitzMatrices, FFTW
 
 include("frft.jl")
 include("frst.jl")
