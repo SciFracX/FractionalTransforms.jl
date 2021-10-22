@@ -1,0 +1,13 @@
+name = "FractionalTransforms"
+uuid = "e50ca838-b4f0-4a10-ad18-4b920bf1ae5c"
+authors = ["Qingyu Qu"]
+version = "0.1.0"
+
+[compat]
+julia = "1.6"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
