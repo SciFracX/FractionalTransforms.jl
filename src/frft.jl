@@ -12,7 +12,7 @@ julia> frft([1,2,3], 0.5)
 1.3156643288728376 - 0.9364535656119107im
 ```
 """
-function frft(signal, α)
+function frft(signal, α)::Vector{ComplexF64}
     
     #Ensure the input signal is a vector
     if typeof(signal) <: Vector
@@ -117,7 +117,9 @@ end
 """
     sinc_interp(signal, rate)
 
-Sinc interpolation of **signal** at rate **rate**
+Sinc interpolation of **signal** at rate **rate**.
+
+For more details, please refer to [Whittaker-Shannon interpolation](https://en.wikipedia.org/wiki/Whittaker%E2%80%93Shannon_interpolation_formula)
 """
 function sinc_interp(x, rate)
     x=x[:]

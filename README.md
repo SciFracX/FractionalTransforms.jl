@@ -86,7 +86,10 @@ The custom Fourier Transform transforms the input signal from time domain to fre
 
 ## Features
 
+## Plans
 
+* Add more examples relating to signal processing, image processing etc.
+* Cover more algorithms, including Fractional Cosine Transform, Fractional Hadamard Transform...
 
 ## Acknowledgements
 

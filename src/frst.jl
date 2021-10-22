@@ -27,7 +27,7 @@ function frst(signal, α, p)
     return result
 end
 
-function dFRST(N, p)
+function dFRST(N::Int64, p)
     N1 = 2*N+2
     d2 = [1, -2, 1]
 
@@ -50,8 +50,6 @@ function dFRST(N, p)
 
     H = Toeplitz(s[:], s[:]) +diagm(real.(fft(s[:])))
 
-
-    N=Int64(N)
     V = hcat(zeros(N), reverse(zeros(N, N)+I, dims=1), zeros(N), -zeros(N, N)+I) ./sqrt(2)
 
     Od = V*H*V'
@@ -59,5 +57,4 @@ function dFRST(N, p)
     eo, vo = eigen(Od)
 
     return reverse(reverse(vo, dims=2), dims=1)
-
 end
