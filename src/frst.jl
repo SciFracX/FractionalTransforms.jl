@@ -17,6 +17,16 @@ doi = {10.1109/78.923302}
     frst(signal, α, p)
 
 Computing the α order fractional sine transform of the input **signal**.
+
+# Example
+
+```julia-repl
+julia> frst([1,2,3], 0.5, 2)
+3-element Vector{ComplexF64}:
+1.707106781186548 + 1.207106781186547im
+1.9999999999999998 - 1.7071067811865481im
+-1.1213203435596437 - 1.2071067811865468im
+```
 """
 function frst(signal, α, p)
     N = length(signal)

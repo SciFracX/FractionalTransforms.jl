@@ -17,6 +17,16 @@ doi = {10.1109/78.923302}
     frct(signal, α, p)
 
 Computing the α order fractional cosine transform of the input **signal**.
+
+# Example
+
+```julia-repl
+julia> frct([1,2,3], 0.5, 2)
+3-element Vector{ComplexF64}:
+1.707106781186547 + 0.9874368670764581im
+1.5606601717798205 - 1.3964466094067267im
+-0.3535533905932727 - 0.6982233047033652im
+```
 """
 function frct(signal, α, p)
     N = length(signal)

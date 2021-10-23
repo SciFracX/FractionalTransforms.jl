@@ -1,7 +1,7 @@
 """
     frft(signal, α)
 
-    By entering the signal and the order, we can obtain the Fractional Fourier transform value.
+By entering the signal and the order, we can obtain the Fractional Fourier transform value.
 
 # Example
 

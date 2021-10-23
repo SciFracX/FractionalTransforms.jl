@@ -83,6 +83,12 @@ julia> frst([1,2,3], 0.5, 2)
 ### Fractional Cosine Transform
 
 ```julia
+julia> frct(signal, 0.5, 2)
+```
+
+For example:
+
+```julia
 julia> frct([1,2,3], 0.5, 2)
 3-element Vector{ComplexF64}:
 1.707106781186547 + 0.9874368670764581im
