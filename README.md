@@ -1,4 +1,4 @@
-# FRFT.jl
+# FractionalTransforms.jl
 
 <p align="center">
 <img width="250px" src="https://raw.githubusercontent.com/SciFracX/FractionalTransforms.jl/master/docs/src/assets/logo.svg"/>
