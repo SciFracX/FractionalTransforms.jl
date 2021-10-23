@@ -27,7 +27,7 @@ function frst(signal, α, p)
     return result
 end
 
-function dFRST(N::Int64, p)
+function dFRST(N, p)
     N1 = 2*N+2
     d2 = [1, -2, 1]
 

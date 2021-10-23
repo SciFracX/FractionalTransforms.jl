@@ -27,7 +27,7 @@ function frct(signal, α, p)
     return result
 end
 
-function dFRCT(N::Int64, p)
+function dFRCT(N, p)
     N1 = 2*N-2
     d2 = [1, -2, 1]
 
