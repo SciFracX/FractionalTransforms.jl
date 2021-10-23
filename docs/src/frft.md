@@ -8,26 +8,26 @@ Pages = ["frft.md"]
 
 While we are already familiar with the ordinary Fourier transform, which is defined by the integral of the product of the original function and a kernel function ``e^{-2\pi ix\xi}​``:
 
-$$
+```math
 \hat{f}(\xi)=\mathcal{F}[f(x)]=\int_{-\infty}^\infty f(x)e^{-2\pi ix\xi}dx
-$$
+```
 
 The Fractional Fourier transform has the similar definition:
-$$
+```math
 \hat{f}(\xi)=\mathcal{F}^{\alpha}[f(x)]=\int_{-\infty}^\infty K(\xi,x)f(x)dx
-$$
+```
 
-$$
+```math
 K(\xi,x)=A_\phi \exp[i\pi(x^2\cot\phi-2x\xi\csc\phi+\xi^2\cot\phi)]
-$$
+```
 
-$$
+```math
 A_\phi=\frac{\exp(-i\pi\ \mathrm{sgn}(\sin\phi)/4+i\phi/2)}{|\sin\phi|^{1/2}}
-$$
+```
 
-$$
+```math
 \phi=\frac{\alpha\pi}{2}
-$$
+```
 
 To compute the α-order Fractional Fourier transform of a signal, you can directly compute using **frft** function: 
 
