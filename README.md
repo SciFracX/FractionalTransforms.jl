@@ -80,6 +80,16 @@ julia> frst([1,2,3], 0.5, 2)
 -1.1213203435596437 - 1.2071067811865468im
 ```
 
+### Fractional Cosine Transform
+
+```julia
+julia> frct([1,2,3], 0.5, 2)
+3-element Vector{ComplexF64}:
+1.707106781186547 + 0.9874368670764581im
+1.5606601717798205 - 1.3964466094067267im
+-0.3535533905932727 - 0.6982233047033652im
+```
+
 ## Introduce
 
 The custom Fourier Transform transforms the input signal from time domain to frequency domain, the Fractional Fourier transform, in a more generalized aspect, can transform the input signal to the fractional domain, reveal more properties and features of signal.
@@ -89,7 +99,7 @@ The custom Fourier Transform transforms the input signal from time domain to fre
 ## Plans
 
 * Add more examples relating to signal processing, image processing etc.
-* Cover more algorithms, including Fractional Cosine Transform, Fractional Hadamard Transform...
+* Cover more algorithms, including Fractional Hadamard Transform...
 
 ## Acknowledgements
 

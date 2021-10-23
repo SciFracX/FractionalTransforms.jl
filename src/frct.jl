@@ -14,21 +14,21 @@ doi = {10.1109/78.923302}
 """
 
 """
-    frst(signal, α, p)
+    frct(signal, α, p)
 
-Computing the α order fractional sine transform of the input **signal**.
+Computing the α order fractional cosine transform of the input **signal**.
 """
-function frst(signal, α, p)
+function frct(signal, α, p)
     N = length(signal)
     signal = signal[:]
     p=min(max(2, p), N-1)
-    E=dFRST(N,p)
+    E=dFRCT(N,p)
     result = E *(exp.(-im*pi*α*collect(0:N-1)) .*(E' *signal))
     return result
 end
 
-function dFRST(N::Int64, p)
-    N1 = 2*N+2
+function dFRCT(N::Int64, p)
+    N1 = 2*N-2
     d2 = [1, -2, 1]
 
     d_p = 1
@@ -43,18 +43,21 @@ function dFRST(N::Int64, p)
         end
         st[vcat(collect(N1-k+1:N1), collect(1:k+1))] = d_p
         st[1]=0
-        temp=vcat(union(1, collect(1:k-1)), union(2,collect(1:k-1)))
+        temp=vcat(union(1, collect(1:k-1)), union(1,collect(1:k-1)))
         temp = temp[:] ./collect(1:2*k)
         s=s.+(-1)^(k-1)*prod(temp)*2*st
     end
 
     H = Toeplitz(s[:], s[:]) +diagm(real.(fft(s[:])))
 
-    V = hcat(zeros(N), reverse(zeros(N, N)+I, dims=1), zeros(N), -zeros(N, N)+I) ./sqrt(2)
+    V = hcat(zeros(N-2), zeros(N-2, N-2)+I, zeros(N-2), reverse(zeros(N-2, N-2)+I, dims=1)) ./sqrt(2)
+    V = vcat([1 zeros(1, N1-1)], V, [zeros(1, N-1) 1 zeros(1, N-2)])
 
-    Od = V*H*V'
+    Ev = V*H*V'
 
-    _, vo = eigen(Od)
+    _, ee = eigen(Ev)
 
-    return reverse(reverse(vo, dims=2), dims=1)
+    E = reverse(ee, dims=2)
+    E[end,:] = E[end,:]/sqrt(2)
+    return E
 end
