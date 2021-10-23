@@ -30,6 +30,7 @@
     <img alt="GitHub forks" src="https://img.shields.io/github/forks/SciFracX/FractionalTransforms.jl?style=flat-square">
   </a>
 </p>
+
 ## Installation
 
 If you have already installed Julia, you can install FractionalTransforms.jl in REPL using Julia package manager:
