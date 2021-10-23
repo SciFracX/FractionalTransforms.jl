@@ -36,7 +36,7 @@ function dFRST(N, p)
     st=zeros(1, N1)
 
     for k = 1:Int64(floor(p/2))
-        if typeof(d_p) <: Int64
+        if typeof(d_p) <: Number
             d_p = d2.*d_p
         else
             d_p = DSP.conv(d2, d_p)
