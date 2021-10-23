@@ -32,13 +32,13 @@
 </p>
 ## Installation
 
-If you have already installed Julia, you can install FRFT.jl in REPL using Julia package manager:
+If you have already installed Julia, you can install FractionalTransforms.jl in REPL using Julia package manager:
 
 ```julia
 Pkg> add FractionalTransforms
 ```
 
-To experience the latest version of FRFT, you can install FRFT.jl by:
+To experience the latest version of FractionalTransforms.jl, you can install FractionalTransforms.jl by:
 
 ```julia
 Pkg> add FractionalTransforms#master
@@ -66,6 +66,8 @@ julia> frft([1,2,3], 0.5)
 
 ### Fractional Sine Transform
 
+Compute the Fractional Sine transform by typing the command:
+
 ```julia
 julia> frst(signal, order, p)
 ```
@@ -82,8 +84,10 @@ julia> frst([1,2,3], 0.5, 2)
 
 ### Fractional Cosine Transform
 
+Compute the Fractional Cosine transform by typing the command:
+
 ```julia
-julia> frct(signal, 0.5, 2)
+julia> frct(signal, order, p)
 ```
 
 For example:
