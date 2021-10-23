@@ -15,8 +15,8 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "Fractional Fourier Transform" => "frft.md"
-        "Fractional Sine Transform" => "frst.md"
+        "Fractional Fourier Transform" => "frft.md",
+        "Fractional Sine Transform" => "frst.md",
         "Fractional Cosine Transform" => "frct.md"
     ],
 )
