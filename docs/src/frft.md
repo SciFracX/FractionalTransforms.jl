@@ -35,7 +35,7 @@ To compute the α-order Fractional Fourier transform of a signal, you can direct
 FractionalTransforms.frft
 ```
 
-## Features:
+## Features
 
 The fractional Fourier transform algorithm is ``O(N\log N)`` time complexity algorithm.
 
