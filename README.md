@@ -105,12 +105,10 @@ julia> frct([1,2,3], 0.5, 2)
 
 The custom Fourier Transform transforms the input signal from time domain to frequency domain, the Fractional Fourier transform, in a more generalized aspect, can transform the input signal to the fractional domain, reveal more properties and features of signal.
 
-## Features
-
 ## Plans
 
 * Add more examples relating to signal processing, image processing etc.
-* Cover more algorithms, including Fractional Hadamard Transform...
+* Cover more algorithms, including Fractional Hadamard Transform, Fractional Gabor Transform...
 
 ## Acknowledgements
 

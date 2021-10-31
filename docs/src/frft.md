@@ -41,7 +41,9 @@ The fractional Fourier transform algorithm is ``O(N\log N)`` time complexity alg
 
 ## Algorithm details
 
+The numerical algorithm can be treated as as follows:
 
+The definition of [Fractional Fourier Transform](https://en.wikipedia.org/wiki/Fractional_Fourier_transform) being interpolated using [Shannon interpolation](https://en.wikipedia.org/wiki/Whittaker%E2%80%93Shannon_interpolation_formula), after limit the range, the formulation can be recognized as the [convolution](https://en.wikipedia.org/wiki/Convolution) of the kernel function and the chirp-modulated function. Then we can use [FFT](https://en.wikipedia.org/wiki/Fast_Fourier_transform) to compute the convolution in $O(N\ \log N)$ time. Finally, process the above output using the [chirp modulation](https://en.wikipedia.org/wiki/Chirp).
 
 ## Acknowledge:
 
