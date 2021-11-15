@@ -1,4 +1,4 @@
-using LinearAlgebra, ToeplitzMatrices, FFTW
+using LinearAlgebra, ToeplitzMatrices, FFTW, DSP
 
 """
 @article{article,
@@ -30,7 +30,7 @@ julia> frct([1,2,3], 0.5, 2)
 """
 function frct(signal, α, p)
     N = length(signal)
-    signal = signal[:]
+    @views signal = signal[:]
     p=min(max(2, p), N-1)
     E=dFRCT(N,p)
     result = E *(exp.(-im*pi*α*collect(0:N-1)) .*(E' *signal))
@@ -42,14 +42,14 @@ function dFRCT(N, p)
     d2 = [1, -2, 1]
 
     d_p = 1
-    s=0
-    st=zeros(1, N1)
+    s = 0
+    st = zeros(1, N1)
 
     for k = 1:Int64(floor(p/2))
         if typeof(d_p) <: Number
-            d_p = d2.*d_p
+            d_p = @. d2*d_p
         else
-            d_p = DSP.conv(d2, d_p)
+            d_p = conv(d2, d_p)
         end
         st[vcat(collect(N1-k+1:N1), collect(1:k+1))] = d_p
         st[1]=0

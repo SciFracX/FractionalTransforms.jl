@@ -1,3 +1,5 @@
+using DSP, LinearAlgebra, ToeplitzMatrices, FFTW
+
 """
     frft(signal, α)
 
@@ -15,9 +17,9 @@ julia> frft([1,2,3], 0.5)
 function frft(signal, α)::Vector{ComplexF64}
     
     #Ensure the input signal is a vector
-    if typeof(signal) <: Vector
+    if isa(signal, Vector)
         nothing
-    elseif typeof(signal) <: Matrix
+    elseif isa(signal, Matrix)
         signal = signal[:]
     else
         error("Please input a proper signal")
@@ -76,7 +78,7 @@ function frft(signal, α)::Vector{ComplexF64}
 
     y = y[2*M+1:end-2*M]
     y = y[1:3:end]
-    y=exp.(-im*(pi*sign(sin(ϕ))/4-ϕ/2)).*y
+    y= @. exp(-im*(pi*sign(sin(ϕ))/4-ϕ/2))*y
 
     return y
 end
@@ -91,7 +93,7 @@ function freq_shear(x, c)
     M = (N-1)/2
     N = collect(-M:M)
 
-    y = x .* exp.(im .*c ./2 .*N .^2)
+    y = @. x*exp(im *c /2 *N ^2)
     return y
 end
 
@@ -102,22 +104,22 @@ function time_shear(x, c)
     if rem(N, 2) == 0
         error("Signal must be odd")
     end
-    M = Int64((N-1) /2)
+    M = Int64((N-1)/2)
 
-    interp = Int64(ceil(2*abs(c) / (2*pi/N)))
+    interp = Int64(ceil(2*abs(c)/(2*pi/N)))
     xx = sinc_interp(x, interp) ./interp
     n = collect(-2*M:1/interp:2*M)
-    z = exp.(im*c/2*n.^2)
+    z = @. exp(im*c/2*n^2)
     y = conv(xx, z)
     center = (length(y)+1)/2
     y = y[Int64(center-interp*M):Int64(interp):Int64(center+interp*M)]
-    y = y .*sqrt(c/2/pi)
+    y = @. y*sqrt(c/2/pi)
 end
 
 """
     sinc_interp(signal, rate)
 
-Sinc interpolation of **signal** at rate **rate**.
+```Sinc interpolation``` of **signal** at rate **rate**.
 
 For more details, please refer to [Whittaker-Shannon interpolation](https://en.wikipedia.org/wiki/Whittaker%E2%80%93Shannon_interpolation_formula)
 """
@@ -127,9 +129,9 @@ function sinc_interp(x, rate)
     M=rate*N-rate+1
 
     y = zeros(ComplexF64, M)
-    y[1:rate:M] = x
+    @views y[1:rate:M] = x
 
-    h = sinc.(collect(-(N-1-1/rate):1/rate:(N-1-1/rate)))
-    out = DSP.conv(y, h)
+    h =  sinc.(collect(-(N-1-1/rate):1/rate:(N-1-1/rate)))
+    out = conv(y, h)
     out=out[(rate*N-rate):(end-rate*N+rate+1)]
 end
