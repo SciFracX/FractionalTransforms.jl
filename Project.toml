@@ -1,6 +1,6 @@
 name = "FractionalTransforms"
 uuid = "e50ca838-b4f0-4a10-ad18-4b920bf1ae5c"
-authors = ["Qingyu Qu"]
+authors = ["Qingyu Qu <erikqqy123@gmail.com>"]
 version = "0.1.0"
 
 [deps]
