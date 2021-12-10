@@ -6,13 +6,14 @@ Pages = ["frft.md"]
 
 ## Definition
 
-While we are already familiar with the ordinary Fourier transform, which is defined by the integral of the product of the original function and a kernel function ``e^{-2\pi ix\xi}​``:
+While we are already familiar with the Fourier transform, which is defined by the integral of the product of the original function and a kernel function ``e^{-2\pi ix\xi}​``:
 
 ```math
 \hat{f}(\xi)=\mathcal{F}[f(x)]=\int_{-\infty}^\infty f(x)e^{-2\pi ix\xi}dx
 ```
 
 The Fractional Fourier transform has the similar definition:
+
 ```math
 \hat{f}(\xi)=\mathcal{F}^{\alpha}[f(x)]=\int_{-\infty}^\infty K(\xi,x)f(x)dx
 ```

@@ -1,4 +1,5 @@
-using DSP, LinearAlgebra, ToeplitzMatrices, FFTW
+using DSP: conv
+using LinearAlgebra, ToeplitzMatrices, FFTW
 
 """
     frft(signal, α)
@@ -78,13 +79,13 @@ function frft(signal, α)::Vector{ComplexF64}
 
     y = y[2*M+1:end-2*M]
     y = y[1:3:end]
-    y= @. exp(-im*(pi*sign(sin(ϕ))/4-ϕ/2))*y
+    y = @. exp(-im*(pi*sign(sin(ϕ))/4-ϕ/2))*y
 
     return y
 end
 
 function freq_shear(x, c)
-    x=x[:]
+    x = x[:]
     N = length(x)
     if rem(N, 2) == 0
         error("Signal must be odd")
@@ -121,17 +122,17 @@ end
 
 ```Sinc interpolation``` of **signal** at rate **rate**.
 
-For more details, please refer to [Whittaker-Shannon interpolation](https://en.wikipedia.org/wiki/Whittaker%E2%80%93Shannon_interpolation_formula)
+For more details, please refer to [Whittaker-Shannon interpolation](https://en.wikipedia.org/wiki/Whittaker%E2%80%93Shannon_interpolation_formula).
 """
 function sinc_interp(x, rate)
-    x=x[:]
-    N=length(x)
-    M=rate*N-rate+1
+    x = x[:]
+    N = length(x)
+    M = rate*N - rate + 1
 
     y = zeros(ComplexF64, M)
     @views y[1:rate:M] = x
 
     h =  sinc.(collect(-(N-1-1/rate):1/rate:(N-1-1/rate)))
     out = conv(y, h)
-    out=out[(rate*N-rate):(end-rate*N+rate+1)]
+    out = out[(rate*N-rate):(end-rate*N+rate+1)]
 end

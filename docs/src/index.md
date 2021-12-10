@@ -34,4 +34,4 @@ I would like to express gratitude to
 **FractionalTransforms.jl** is built upon the hard work of many scientific researchers, I sincerely appreciate what they have done to help the development of science and technology.
 
 !!! info "WIP"
-		FractionalTransforms.jl is under heavy construction, some API or docs might change a lot.
+	FractionalTransforms.jl is under heavy construction, some API or docs might change a lot.
