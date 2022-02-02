@@ -31,8 +31,8 @@ julia> frct([1,2,3], 0.5, 2)
 function frct(signal, α, p)
     N = length(signal)
     @views signal = signal[:]
-    p=min(max(2, p), N-1)
-    E=dFRCT(N,p)
+    p = min(max(2, p), N-1)
+    E = dFRCT(N,p)
     result = E *(exp.(-im*pi*α*collect(0:N-1)) .*(E' *signal))
     return result
 end
@@ -55,7 +55,7 @@ function dFRCT(N, p)
         st[1]=0
         temp=vcat(union(1, collect(1:k-1)), union(1,collect(1:k-1)))
         temp = temp[:] ./collect(1:2*k)
-        s=s.+(-1)^(k-1)*prod(temp)*2*st
+        s = s.+(-1)^(k-1)*prod(temp)*2*st
     end
 
     H = Toeplitz(s[:], s[:]) +diagm(real.(fft(s[:])))

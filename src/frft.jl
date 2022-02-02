@@ -17,14 +17,8 @@ julia> frft([1,2,3], 0.5)
 """
 function frft(signal, α)::Vector{ComplexF64}
     
-    #Ensure the input signal is a vector
-    if isa(signal, Vector)
-        nothing
-    elseif isa(signal, Matrix)
-        signal = signal[:]
-    else
-        error("Please input a proper signal")
-    end
+    #Ensure the input signal is proper
+    isa(signal, AbstractArray) ? nothing : error("Please input a proper signal")
 
     N = length(signal)
     M = Int64((N-1)/2)
@@ -51,7 +45,6 @@ function frft(signal, α)::Vector{ComplexF64}
         return y
     end
 
-    #
     if α > 2
         signal = reverse(signal, dims=1)
         α = α-2
@@ -67,6 +60,7 @@ function frft(signal, α)::Vector{ComplexF64}
         α = α+1
     end
 
+    # We need to distinguish **order** and **angle**
     ϕ = α*π/2
 
     # Set the sampling rate as 3.
