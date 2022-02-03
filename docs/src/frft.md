@@ -40,6 +40,10 @@ FractionalTransforms.frft
 
 The fractional Fourier transform algorithm is ``O(N\log N)`` time complexity algorithm.
 
+## Relationship with FRST and FRCT
+
+The FRFT can be computed by a smaller transform kernel with the help of the FRCT or the DFRST for the even or odd signal.
+
 ## Algorithm details
 
 The numerical algorithm can be treated as as follows:

@@ -36,13 +36,13 @@
 If you have already installed Julia, you can install FractionalTransforms.jl in REPL using Julia package manager:
 
 ```julia
-Pkg> add FractionalTransforms
+pkg> add FractionalTransforms
 ```
 
 To experience the latest version of FractionalTransforms.jl, you can install FractionalTransforms.jl by:
 
 ```julia
-Pkg> add FractionalTransforms#master
+pkg> add FractionalTransforms#master
 ```
 
 ## Quick start
