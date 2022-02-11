@@ -45,7 +45,7 @@ function dFRCT(N, p)
     s = 0
     st = zeros(1, N1)
 
-    for k = 1:Int64(floor(p/2))
+    for k = 1:floor(Int, p/2)
         if typeof(d_p) <: Number
             d_p = @. d2*d_p
         else
@@ -60,7 +60,7 @@ function dFRCT(N, p)
 
     H = Toeplitz(s[:], s[:]) + diagm(real.(fft(s[:])))
 
-    V = hcat(zeros(N-2), zeros(N-2, N-2)+I, zeros(N-2), reverse(zeros(N-2, N-2)+I, dims=1)) ./sqrt(2)
+    V = hcat(zeros(N-2), I(N-2), zeros(N-2), reverse(I(N-2), dims=1)) ./sqrt(2)
     V = vcat([1 zeros(1, N1-1)], V, [zeros(1, N-1) 1 zeros(1, N-2)])
 
     Ev = V*H*V'

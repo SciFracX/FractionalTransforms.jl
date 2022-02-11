@@ -45,7 +45,7 @@ function dFRST(N, p)
     s = 0
     st = zeros(1, N1)
 
-    for k = 1:Int64(floor(p/2))
+    for k = 1:floor(Int, p/2)
         if isa(d_p, Number) 
             d_p = @. d2*d_p
         else
@@ -60,7 +60,7 @@ function dFRST(N, p)
 
     H = Toeplitz(s[:], s[:]) +diagm(real.(fft(s[:])))
 
-    V = hcat(zeros(N), reverse(zeros(N, N)+I, dims=1), zeros(N), -zeros(N, N)+I) ./sqrt(2)
+    V = hcat(zeros(N), reverse(I(N), dims=1), zeros(N), -I(N)) ./sqrt(2)
 
     Od = V*H*V'
 
