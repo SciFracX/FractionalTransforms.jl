@@ -60,7 +60,7 @@ function dFRST(N, p)
 
     H = Toeplitz(s[:], s[:]) +diagm(real.(fft(s[:])))
 
-    V = hcat(zeros(N), reverse(I(N), dims=1), zeros(N), -I(N)) ./sqrt(2)
+    V = hcat(zeros(N), reverse(zeros(N, N)+I, dims=1), zeros(N), -(zeros(N, N)+I)) ./sqrt(2)
 
     Od = V*H*V'
 

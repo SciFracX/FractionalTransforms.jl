@@ -60,7 +60,7 @@ function dFRCT(N, p)
 
     H = Toeplitz(s[:], s[:]) + diagm(real.(fft(s[:])))
 
-    V = hcat(zeros(N-2), I(N-2), zeros(N-2), reverse(I(N-2), dims=1)) ./sqrt(2)
+    V = hcat(zeros(N-2), zeros(N-2, N-2)+I, zeros(N-2), reverse(zeros(N-2, N-2)+I, dims=1)) ./sqrt(2)
     V = vcat([1 zeros(1, N1-1)], V, [zeros(1, N-1) 1 zeros(1, N-2)])
 
     Ev = V*H*V'

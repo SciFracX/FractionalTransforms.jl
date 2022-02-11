@@ -98,7 +98,7 @@ function time_shear(x, c)
     end
     M = Int64((N-1)/2)
 
-    interp = Int64(ceil(2*abs(c)/(2*pi/N)))
+    interp = ceil(Int, 2*abs(c)/(2*pi/N))
     xx = sinc_interp(x, interp) ./interp
     n = collect(-2*M:1/interp:2*M)
     z = @. exp(im*c/2*n^2)
