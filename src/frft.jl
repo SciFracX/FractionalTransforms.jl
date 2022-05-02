@@ -85,7 +85,7 @@ function freq_shear(x, c)
     M = (N-1)/2
     N = collect(-M:M)
 
-    y = @. x*exp(im *c /2 *N ^2)
+    y = @. x*exp(im*c/2*N^2)
     return y
 end
 
@@ -97,7 +97,7 @@ function time_shear(x, c)
         error("Signal must be odd")
     end
     M = Int64((N-1)/2)
-
+    
     interp = ceil(Int, 2*abs(c)/(2*pi/N))
     xx = sinc_interp(x, interp) ./interp
     n = collect(-2*M:1/interp:2*M)
@@ -121,7 +121,7 @@ function sinc_interp(x, rate)
     M = rate*N - rate + 1
 
     y = zeros(ComplexF64, M)
-    @views y[1:rate:M] = x
+    y[1:rate:M] = x
 
     h =  sinc.(collect(-(N-1-1/rate):1/rate:(N-1-1/rate)))
     out = conv(y, h)

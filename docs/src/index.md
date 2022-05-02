@@ -32,6 +32,3 @@ I would like to express gratitude to
 * [The discrete fractional cosine and sine transforms](http://dx.doi.org/10.1109/78.923302) by Pei, Soo-Chang and Yeh, Min-Hung.
 
 **FractionalTransforms.jl** is built upon the hard work of many scientific researchers, I sincerely appreciate what they have done to help the development of science and technology.
-
-!!! info "WIP"
-	FractionalTransforms.jl is under heavy construction, some API or docs might change a lot.

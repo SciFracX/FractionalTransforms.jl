@@ -39,17 +39,11 @@ If you have already installed Julia, you can install FractionalTransforms.jl in 
 pkg> add FractionalTransforms
 ```
 
-To experience the latest version of FractionalTransforms.jl, you can install FractionalTransforms.jl by:
-
-```julia
-pkg> add FractionalTransforms#master
-```
-
 ## Quick start
 
 ### Fractional Fourier Transform
 
-Compute the Fractional Fourier transform by typing the command:
+Compute the Fractional Fourier transform by the following command:
 
 ```julia
 frft(signal, order)
@@ -57,7 +51,7 @@ frft(signal, order)
 
 ### Fractional Sine Transform
 
-Compute the Fractional Sine transform by typing the command:
+Compute the Fractional Sine transform by the following command:
 
 ```julia
 julia> frst(signal, order, p)
@@ -65,7 +59,7 @@ julia> frst(signal, order, p)
 
 ### Fractional Cosine Transform
 
-Compute the Fractional Cosine transform by typing the command:
+Compute the Fractional Cosine transform by the following command:
 
 ```julia
 julia> frct(signal, order, p)
@@ -73,7 +67,7 @@ julia> frct(signal, order, p)
 
 ## Introduce
 
-The custom Fourier Transform transforms the input signal from time domain to frequency domain, the Fractional Fourier transform, in a more generalized aspect, can transform the input signal to the fractional domain, reveal more properties and features of signal.
+The custom Fourier Transform transforms the input signal from time domain to frequency domain, the Fractional Fourier transform, in a more generalized aspect, can transform the input signal to the fractional domain, reveal more properties and features of the signal.
 
 ## Plans
 
