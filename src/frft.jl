@@ -1,5 +1,3 @@
-using FFTW, DSP
-
 """
     frft(signal, α)
 
@@ -129,5 +127,3 @@ function sinc_interp(x, rate)
     out = conv(y, h)
     out = out[(rate*N-rate):(end-rate*N+rate+1)]
 end
-
-frft([2, 2, 2], 0.3)
