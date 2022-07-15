@@ -7,123 +7,112 @@ By entering the signal and the order, we can obtain the Fractional Fourier trans
 
 ```julia-repl
 julia> frft([1,2,3], 0.5)
-0.10046461358821344 - 0.25940948097727745im
-3.0746001042331557 + 0.19934938154063286im
-1.3156643288728376 - 0.9364535656119107im
+0.2184858049179108 - 0.48050718989735614im
+3.1682634817489754 + 0.38301661364477946im
+1.3827766087134183 - 1.1551815500981393im
 ```
 """
-function frft(signal, α)::Vector{ComplexF64}
+function frft(f, α)
     
-    #Ensure the input signal is proper
-    isa(signal, AbstractArray) ? nothing : error("Please input a proper signal")
-
-    N = length(signal)
-    M = Int64((N-1)/2)
-
-    if rem(N, 2)==0
-        error("Signal must be odd")
-    end
-
-    ##For α special cases
-    #If the order is an integer, the fourier transform would be its n-th order Fourier transform.
+    f = f[:]
+    f=ComplexF64.(f)
+    N = length(f)
+    signal = zeros(ComplexF64, N)
+    shft = rem.(collect(Int64, 0:N-1).+floor(Int64, N/2), N).+1
+    sN = sqrt(N)
     α = mod(α, 4)
-    if α == 0
-        return signal
-    elseif α == 1
-        y = fft([signal[M+1:N]; signal[1:M]])/sqrt(N)
-        y = [y[M+2 : N]; y[1:M+1]]
-        return y
-    elseif α == 2
-        y = reverse(signal, dims=1)
-        return y
-    elseif α == 3
-        y = ifft([signal[M+1:N]; signal[1:M]])*sqrt(N)
-        y = [y[M+2:N]; y[1:M+1]]
-        return y
-    end
-
-    if α > 2
-        signal = reverse(signal, dims=1)
-        α = α-2
-    end
-    if α > 1.5
-        signal = fft([signal[M+1:N]; signal[1:M]]) ./sqrt(N)
-        signal = [signal[M+2 : N]; signal[1:M+1]]
-        α = α-1
-    end
-    if α < 0.5
-        signal = ifft([signal[M+1:N]; signal[1:M]]) .*sqrt(N)
-        signal = [signal[M+2:N]; signal[1:M+1]]
-        α = α+1
-    end
-
-    # We need to distinguish **order** and **angle**
-    ϕ = α*π/2
-
-    # Set the sampling rate as 3.
-    signal = sinc_interp(signal, 3)
-    signal = [zeros(ComplexF64, 2*M); signal; zeros(ComplexF64, 2*M)]
-
-    x2 = freq_shear(signal, 2*pi/N*(cot(ϕ)-csc(ϕ))/3^2)
-    x3 = time_shear(x2, 2*pi/N*csc(ϕ)/3^2)
-    y = freq_shear(x3, 2*pi/N*(cot(ϕ)-csc(ϕ))/3^2)
-
-    y = y[2*M+1:end-2*M]
-    y = y[1:3:end]
-    y = @. exp(-im*(pi*sign(sin(ϕ))/4-ϕ/2))*y
-
-    return y
-end
-
-function freq_shear(x, c)
-    x = x[:]
-    N = length(x)
-    if rem(N, 2) == 0
-        error("Signal must be odd")
-    end
-
-    M = (N-1)/2
-    N = collect(-M:M)
-
-    y = @. x*exp(im*c/2*N^2)
-    return y
-end
-
-function time_shear(x, c)
-    x = x[:]
-    N = length(x)
-
-    if rem(N, 2) == 0
-        error("Signal must be odd")
-    end
-    M = Int64((N-1)/2)
     
-    interp = ceil(Int, 2*abs(c)/(2*pi/N))
-    xx = sinc_interp(x, interp) ./interp
-    n = collect(-2*M:1/interp:2*M)
-    z = @. exp(im*c/2*n^2)
-    y = conv(xx, z)
-    center = (length(y)+1)/2
-    y = y[Int64(center-interp*M):Int64(interp):Int64(center+interp*M)]
-    y = @. y*sqrt(c/2/pi)
+    if α==0
+        signal = f
+        return signal
+    end
+    if α==2
+        signal = reverse(f, dims=1)
+        return signal
+    end
+    if α==1
+        signal[shft,1] = fft(f[shft])/sN
+        return signal
+    end 
+    if α==3
+        signal[shft, 1] = ifft(f[shft])*sN
+        return signal
+    end
+    
+
+    if α>2.0
+        α = α-2
+        f = reverse(f, dims=1)
+    end
+    if α>1.5
+        α = α-1
+        f[shft] = fft(f[shft])/sN
+    end
+    if α<0.5
+        α = α+1
+        f[shft, 1] = ifft(f[shft])*sN
+    end
+    
+    alpha = α*pi/2
+    tana2 = tan(alpha/2)
+    sina = sin(alpha)
+    f = [zeros(N-1,1) ; interp(f) ; zeros(N-1,1)]
+    
+
+    chrp = exp.(-im*pi/N*tana2/4*collect(-2*N+2:2*N-2).^2)
+    f = chrp.*f
+    
+
+    c = pi/N/sina/4;
+    signal = fconv(exp.(im*c*collect(-(4*N-4):4*N-4).^2), f)
+    signal = signal[4*N-3:8*N-7]*sqrt(c/pi)
+    
+
+    signal = chrp.*signal
+    
+    signal = @. exp(-im*(1-α)*pi/4)*signal[N:2:end-N+1]
+
+    return signal
 end
 
-"""
-    sinc_interp(signal, rate)
-
-```Sinc interpolation``` of **signal** at rate **rate**.
-
-For more details, please refer to [Whittaker-Shannon interpolation](https://en.wikipedia.org/wiki/Whittaker%E2%80%93Shannon_interpolation_formula).
-"""
-function sinc_interp(x, rate)
-    x = x[:]
+function interp(x)
     N = length(x)
-    M = rate*N - rate + 1
+    y = zeros(ComplexF64, 2*N-1, 1)
+    y[1:2:2*N-1] = x
+    xint = fconv(y[1:2*N-1], sinc.(collect(-(2*N-3):(2*N-3))'/2))
+    xint = xint[2*N-2:end-2*N+3]
+    return xint
+end
 
-    y = zeros(ComplexF64, M)
-    y[1:rate:M] = x
+function fconv(x,y)
 
-    h =  sinc.(collect(-(N-1-1/rate):1/rate:(N-1-1/rate)))
-    out = conv(y, h)
-    out = out[(rate*N-rate):(end-rate*N+rate+1)]
+    N = length([x[:];  y[:]])-1
+    P::Int = nextpow(2, N)
+    z = ifft(ourfft(x, P) .* ourfft(y, P))
+    z = z[1:N]
+    return z
+end
+
+function ourfft(x, n)
+    s=length(x)
+    x=x[:]
+    if s > n
+        return fft(x[1:n])
+    elseif s < n
+        return fft([x; zeros(n-s)])
+    else
+        return fft(x)
+    end
+end
+
+function ourifft(x, n)
+    s=length(x)
+    x=x[:]
+    if s > n
+        return ifft(x[1:n])
+    elseif s < n
+        return ifft([x; zeros(n-s)])
+    else
+        return ifft(x)
+    end
 end
