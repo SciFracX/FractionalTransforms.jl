@@ -1,3 +1,5 @@
+using FFTW, DSP
+
 """
     frft(signal, α)
 
@@ -37,8 +39,8 @@ function frft(signal, α)::Vector{ComplexF64}
         y = reverse(signal, dims=1)
         return y
     elseif α == 3
-        y = fft([signal[M+1:N]; signal[1:M]])*sqrt(N)
-        y = [y[M+2 : N]; y[1:M+1]]
+        y = ifft([signal[M+1:N]; signal[1:M]])*sqrt(N)
+        y = [y[M+2:N]; y[1:M+1]]
         return y
     end
 
@@ -46,14 +48,14 @@ function frft(signal, α)::Vector{ComplexF64}
         signal = reverse(signal, dims=1)
         α = α-2
     end
-    if 1.5 < α < 2
-        y = fft([signal[M+1:N]; signal[1:M]]) ./sqrt(N)
-        y = [y[M+2 : N]; y[1:M+1]]
+    if α > 1.5
+        signal = fft([signal[M+1:N]; signal[1:M]]) ./sqrt(N)
+        signal = [signal[M+2 : N]; signal[1:M+1]]
         α = α-1
     end
     if α < 0.5
-        y = fft([signal[M+1:N]; signal[1:M]]) .*sqrt(N)
-        y = [y[M+2 : N]; y[1:M+1]]
+        signal = ifft([signal[M+1:N]; signal[1:M]]) .*sqrt(N)
+        signal = [signal[M+2:N]; signal[1:M+1]]
         α = α+1
     end
 
@@ -127,3 +129,5 @@ function sinc_interp(x, rate)
     out = conv(y, h)
     out = out[(rate*N-rate):(end-rate*N+rate+1)]
 end
+
+frft([2, 2, 2], 0.3)
