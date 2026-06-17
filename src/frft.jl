@@ -13,106 +13,113 @@ julia> frft([1,2,3], 0.5)
 ```
 """
 function frft(f, α)
-    
-    f = f[:]
-    f=ComplexF64.(f)
+    f = vec(f)
     N = length(f)
-    signal = zeros(ComplexF64, N)
-    shft = rem.(collect(Int64, 0:N-1).+floor(Int64, N/2), N).+1
-    sN = sqrt(N)
+    shft = mod1.((0:N-1) .+ fld(N, 2) .+ 1, N)
+    T = promote_type(float(real(eltype(f))), float(typeof(α)))
+    f = complex.(convert.(T, f))
+    sN = sqrt(convert(T, N))
     α = mod(α, 4)
-    
-    if α==0
-        signal = f
-        return signal
-    end
-    if α==2
-        signal = reverse(f, dims=1)
-        return signal
-    end
-    if α==1
-        signal[shft,1] = fft(f[shft])/sN
-        return signal
-    end 
-    if α==3
-        signal[shft, 1] = ifft(f[shft])*sN
-        return signal
-    end
-    
 
-    if α>2.0
-        α = α-2
-        f = reverse(f, dims=1)
+    if α == 0
+        return f
+    elseif α == 2
+        reverse!(f)
+        return f
+    elseif α == 1
+        signal = similar(f)
+        signal[shft] = fft(f[shft]) / sN
+        return signal
+    elseif α == 3
+        signal = similar(f)
+        signal[shft] = ifft(f[shft]) * sN
+        return signal
     end
-    if α>1.5
-        α = α-1
-        f[shft] = fft(f[shft])/sN
+
+    if α > 2.0
+        α -= 2
+        reverse!(f)
     end
-    if α<0.5
-        α = α+1
-        f[shft, 1] = ifft(f[shft])*sN
+    if α > 1.5
+        α -= 1
+        f[shft] = fft(f[shft]) / sN
+    elseif α < 0.5
+        α += 1
+        f[shft] = ifft(f[shft]) * sN
     end
-    
-    alpha = α*pi/2
+
+    alpha = α * pi / 2
     tana2 = tan(alpha/2)
     sina = sin(alpha)
-    f = [zeros(N-1,1) ; interp(f) ; zeros(N-1,1)]
-    
 
-    chrp = exp.(-im*pi/N*tana2/4*collect(-2*N+2:2*N-2).^2)
-    f = chrp.*f
-    
+    interpolated = interp(f)
+    padded = zeros(complex(T), 4 * N - 3)
+    @views padded[N:3*N-2] .= interpolated
 
-    c = pi/N/sina/4;
-    signal = fconv(exp.(im*c*collect(-(4*N-4):4*N-4).^2), f)
-    signal = signal[4*N-3:8*N-7]*sqrt(c/pi)
-    
+    chrp = exp.((-im * pi * tana2 / (4 * N)) .* ((-2 * N + 2):(2 * N - 2)).^2)
+    padded .*= chrp
 
-    signal = chrp.*signal
-    
-    signal = @. exp(-im*(1-α)*pi/4)*signal[N:2:end-N+1]
+    c = pi / (4 * N * sina)
+    signal = fconv(exp.((im * c) .* (-(4 * N - 4):(4 * N - 4)).^2), padded)
+    signal = signal[4 * N - 3:8 * N - 7] .* sqrt(c / pi)
+    signal .*= chrp
 
-    return signal
+    phase = exp(-im * (1 - α) * pi / 4)
+    result = similar(f)
+    @inbounds for i in eachindex(result)
+        result[i] = phase * signal[N + 2 * (i - 1)]
+    end
+
+    return result
 end
 
 function interp(x)
     N = length(x)
-    y = zeros(ComplexF64, 2*N-1, 1)
+    T = eltype(x)
+    y = zeros(T, 2 * N - 1)
     y[1:2:2*N-1] = x
-    xint = fconv(y[1:2*N-1], sinc.(collect(-(2*N-3):(2*N-3))'/2))
-    xint = xint[2*N-2:end-2*N+3]
-    return xint
+    xint = fconv(y, sinc.((-(2 * N - 3):(2 * N - 3)) ./ 2))
+    return xint[2 * N - 2:end - 2 * N + 3]
 end
 
-function fconv(x,y)
-
-    N = length([x[:];  y[:]])-1
+function fconv(x, y)
+    N = length(x) + length(y) - 1
     P::Int = nextpow(2, N)
-    z = ifft(ourfft(x, P) .* ourfft(y, P))
-    z = z[1:N]
-    return z
+    T = promote_type(eltype(x), eltype(y))
+    z = ifft(ourfft(x, P, T) .* ourfft(y, P, T))
+    return z[1:N]
 end
 
-function ourfft(x, n)
-    s=length(x)
-    x=x[:]
-    if s > n
-        return fft(x[1:n])
-    elseif s < n
-        return fft([x; zeros(n-s)])
-    else
-        return fft(x)
+function ourfft(x, n, ::Type{T}) where {T}
+    xvec = vec(x)
+    s = length(xvec)
+
+    if s == n
+        return fft(xvec)
     end
+
+    padded = Vector{complex(T)}(undef, n)
+    copyto!(padded, 1, xvec, 1, min(s, n))
+    if s < n
+        fill!(@view(padded[s+1:n]), zero(complex(T)))
+    end
+
+    return fft(padded)
 end
 
-function ourifft(x, n)
-    s=length(x)
-    x=x[:]
-    if s > n
-        return ifft(x[1:n])
-    elseif s < n
-        return ifft([x; zeros(n-s)])
-    else
-        return ifft(x)
+function ourifft(x, n, ::Type{T}) where {T}
+    xvec = vec(x)
+    s = length(xvec)
+
+    if s == n
+        return ifft(xvec)
     end
+
+    padded = Vector{complex(T)}(undef, n)
+    copyto!(padded, 1, xvec, 1, min(s, n))
+    if s < n
+        fill!(@view(padded[s+1:n]), zero(complex(T)))
+    end
+
+    return ifft(padded)
 end

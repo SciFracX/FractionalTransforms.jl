@@ -28,43 +28,75 @@ doi = {10.1109/78.923302}
 }
 ```
 """
+const DFRST_CACHE = Dict{Tuple{Int, Int, DataType}, Matrix}()
+
 function frst(signal, α, p)
     N = length(signal)
-    @views signal = signal[:]
-    p = min(max(2, p), N-1)
-    E = dFRST(N,p)
-    result = E *(exp.(-im*pi*α*collect(0:N-1)) .*(E' *signal))
-    return result
+    signal = vec(signal)
+    p = clamp(p, 2, N - 1)
+    T = promote_type(float(real(eltype(signal))), float(typeof(α)))
+    signal = complex.(convert.(T, signal))
+    E = dFRST(N, p, T)
+    result = E' * signal
+    result .*= cispi.(-α .* (0:N-1))
+    return E * result
 end
 
-function dFRST(N, p)
-    N1 = 2*N+2
-    d2 = [1, -2, 1]
+function dFRST(N, p, ::Type{T}) where {T}
+    return get!(DFRST_CACHE, (N, p, T)) do
+        _dFRST(N, p, T)
+    end
+end
 
-    d_p = 1
-    s = 0
-    st = zeros(1, N1)
+function _dFRST(N, p, ::Type{T}) where {T}
+    N1 = 2 * N + 2
+    half_p = fld(p, 2)
+    s = zeros(T, N1)
+    st = zeros(T, N1)
+    d_p = T[one(T), -2 * one(T), one(T)]
+    coeff = 2 * one(T)
 
-    for k = 1:floor(Int, p/2)
-        if isa(d_p, Number) 
-            d_p = @. d2*d_p
-        else
-            d_p = conv(d2, d_p)
+    for k in 1:half_p
+        if k > 1
+            d_p = second_difference(d_p)
+            coeff *= -((k - 1)^2) * one(T) / ((2 * k) * (2 * k - 1))
         end
-        st[vcat(collect(N1-k+1:N1), collect(1:k+1))] = d_p
-        st[1]=0
-        temp=vcat(union(1, collect(1:k-1)), union(2,collect(1:k-1)))
-        temp = temp[:] ./collect(1:2*k)
-        s=s.+(-1)^(k-1)*prod(temp)*2*st
+
+        @views st[N1-k+1:N1] .= d_p[1:k]
+        @views st[1:k+1] .= d_p[k+1:end]
+        st[1] = zero(T)
+        s .+= coeff .* st
     end
 
-    H = Toeplitz(s[:], s[:]) +diagm(real.(fft(s[:])))
+    spectrum = real.(fft(s))
+    H = Matrix(Toeplitz(s, s))
+    @inbounds for i in eachindex(s)
+        H[i, i] += spectrum[i]
+    end
 
-    V = hcat(zeros(N), reverse(zeros(N, N)+I, dims=1), zeros(N), -(zeros(N, N)+I)) ./sqrt(2)
+    invsqrt2 = inv(sqrt(T(2)))
+    V = zeros(T, N, N1)
+    @inbounds for i in 1:N
+        V[i, N - i + 2] = invsqrt2
+        V[i, N + i + 2] = -invsqrt2
+    end
 
-    Od = V*H*V'
+    Od = Symmetric(V * H * V')
+    vo = eigen(Od).vectors
+    return reverse(reverse(vo, dims = 2), dims = 1)
+end
 
-    _, vo = eigen(Od)
+function second_difference(x::AbstractVector{T}) where {T}
+    n = length(x)
+    y = Vector{T}(undef, n + 2)
+    y[1] = x[1]
+    y[2] = x[2] - 2 * x[1]
 
-    return reverse(reverse(vo, dims=2), dims=1)
+    @inbounds for i in 3:n
+        y[i] = x[i] - 2 * x[i - 1] + x[i - 2]
+    end
+
+    y[n + 1] = x[n - 1] - 2 * x[n]
+    y[n + 2] = x[n]
+    return y
 end

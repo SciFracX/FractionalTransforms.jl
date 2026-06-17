@@ -28,46 +28,80 @@ doi = {10.1109/78.923302}
 }
 ```
 """
+const DFRCT_CACHE = Dict{Tuple{Int, Int, DataType}, Matrix}()
+
 function frct(signal, α, p)
     N = length(signal)
-    @views signal = signal[:]
-    p = min(max(2, p), N-1)
-    E = dFRCT(N,p)
-    result = E *(exp.(-im*pi*α*collect(0:N-1)) .*(E' *signal))
-    return result
+    signal = vec(signal)
+    p = clamp(p, 2, N - 1)
+    T = promote_type(float(real(eltype(signal))), float(typeof(α)))
+    signal = complex.(convert.(T, signal))
+    E = dFRCT(N, p, T)
+    result = E' * signal
+    result .*= cispi.(-α .* (0:N-1))
+    return E * result
 end
 
-function dFRCT(N, p)
-    N1 = 2*N-2
-    d2 = [1, -2, 1]
+function dFRCT(N, p, ::Type{T}) where {T}
+    return get!(DFRCT_CACHE, (N, p, T)) do
+        _dFRCT(N, p, T)
+    end
+end
 
-    d_p = 1
-    s = 0
-    st = zeros(1, N1)
+function _dFRCT(N, p, ::Type{T}) where {T}
+    N1 = 2 * N - 2
+    half_p = fld(p, 2)
+    s = zeros(T, N1)
+    st = zeros(T, N1)
+    d_p = T[one(T), -2 * one(T), one(T)]
+    coeff = 2 * one(T)
 
-    for k = 1:floor(Int, p/2)
-        if typeof(d_p) <: Number
-            d_p = @. d2*d_p
-        else
-            d_p = conv(d2, d_p)
+    for k in 1:half_p
+        if k > 1
+            d_p = second_difference_frct(d_p)
+            coeff *= -((k - 1)^2) * one(T) / ((2 * k) * (2 * k - 1))
         end
-        st[vcat(collect(N1-k+1:N1), collect(1:k+1))] = d_p
-        st[1] = 0
-        temp = vcat(union(1, collect(1:k-1)), union(1,collect(1:k-1)))
-        temp = temp[:] ./collect(1:2*k)
-        s = s.+(-1)^(k-1)*prod(temp)*2*st
+
+        @views st[N1-k+1:N1] .= d_p[1:k]
+        @views st[1:k+1] .= d_p[k+1:end]
+        st[1] = zero(T)
+        s .+= coeff .* st
     end
 
-    H = Toeplitz(s[:], s[:]) + diagm(real.(fft(s[:])))
+    spectrum = real.(fft(s))
+    H = Matrix(Toeplitz(s, s))
+    @inbounds for i in eachindex(s)
+        H[i, i] += spectrum[i]
+    end
 
-    V = hcat(zeros(N-2), zeros(N-2, N-2)+I, zeros(N-2), reverse(zeros(N-2, N-2)+I, dims=1)) ./sqrt(2)
-    V = vcat([1 zeros(1, N1-1)], V, [zeros(1, N-1) 1 zeros(1, N-2)])
+    invsqrt2 = inv(sqrt(T(2)))
+    V = zeros(T, N, N1)
+    @inbounds for i in 1:N - 2
+        V[i + 1, i + 1] = invsqrt2
+        V[i + 1, N1 - i + 1] = invsqrt2
+    end
+    V[1, 1] = one(T)
+    V[N, N] = one(T)
 
-    Ev = V*H*V'
+    Ev = Symmetric(V * H * V')
+    vo = eigen(Ev).vectors
 
-    _, ee = eigen(Ev)
-
-    E = reverse(ee, dims=2)
-    E[end,:] = E[end,:]/sqrt(2)
+    E = reverse(vo, dims = 2)
+    @views E[end, :] .*= invsqrt2
     return E
+end
+
+function second_difference_frct(x::AbstractVector{T}) where {T}
+    n = length(x)
+    y = Vector{T}(undef, n + 2)
+    y[1] = x[1]
+    y[2] = x[2] - 2 * x[1]
+
+    @inbounds for i in 3:n
+        y[i] = x[i] - 2 * x[i - 1] + x[i - 2]
+    end
+
+    y[n + 1] = x[n - 1] - 2 * x[n]
+    y[n + 2] = x[n]
+    return y
 end
